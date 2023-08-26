@@ -1,3 +1,4 @@
+# https://cloud.google.com/billing/docs/how-to/notify?hl=ja#create-a-cloud-function
 import base64
 import json
 import os
