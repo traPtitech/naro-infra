@@ -1,20 +1,12 @@
-import { Construct } from "constructs";
-import { App, TerraformStack } from "cdktf";
-import { provider } from "@cdktf/provider-google";
+import { App } from "cdktf";
+import { Chapter3Stack } from "./stacks/chapter3";
 
-interface Config {
-  google?: provider.GoogleProviderConfig;
-}
-
-class MyStack extends TerraformStack {
-  constructor(scope: Construct, id: string, config: Config) {
-    super(scope, id);
-
-    new provider.GoogleProvider(this, "google", config.google);
-
-    // define resources here
-  }
-}
 const app = new App();
-new MyStack(app, "chapter3", {});
+new Chapter3Stack(app, "chapter3", {
+  google: {
+    project: "naro-terraform",
+    region: "asia-northeast-1",
+    bucket: "naro-terraform-tfstate",
+  },
+});
 app.synth();
