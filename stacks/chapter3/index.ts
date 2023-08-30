@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { GcsBackend, TerraformStack } from "cdktf";
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider";
 import { Folder } from "@cdktf/provider-google/lib/folder";
-import { ProjectStack, User } from "../../modules/project";
+import { ProjectStack, User } from "../project";
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
 

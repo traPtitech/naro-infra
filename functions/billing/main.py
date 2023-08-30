@@ -3,8 +3,7 @@ import base64
 import json
 import os
 from googleapiclient import discovery
-PROJECT_ID = os.getenv('GCP_PROJECT_ID')
-PROJECT_NAME = f'projects/{PROJECT_ID}'
+PROJECT_NAME = os.getenv('GCP_PROJECT_ID')
 def stop_billing(data, context):
     pubsub_data = base64.b64decode(data['data']).decode('utf-8')
     pubsub_json = json.loads(pubsub_data)
