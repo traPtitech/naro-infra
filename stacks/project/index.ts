@@ -1,4 +1,4 @@
-import { project, projectIamMember, pubsubTopic } from "@cdktf/provider-google";
+import { project, projectIamMember } from "@cdktf/provider-google";
 import { TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 
@@ -15,10 +15,10 @@ export interface ProjectConfig {
 }
 
 export class ProjectStack extends TerraformStack {
+  proj: project.Project;
   constructor(scope: Construct, id: string, config: ProjectConfig) {
     super(scope, id);
-
-    const participantProject = new project.Project(
+    this.proj = new project.Project(
       this,
       config.prefix + config.participant.id,
       {
@@ -34,14 +34,13 @@ export class ProjectStack extends TerraformStack {
     );
 
     new projectIamMember.ProjectIamMember(this, "participant-editor", {
-      project: participantProject.id,
+      project: this.proj.id,
       role: "roles/editor",
       member: `user:${config.participant.gmail}`,
     });
-
     config.admins.forEach((v) => {
       new projectIamMember.ProjectIamMember(this, "admin-" + v.id, {
-        project: participantProject.id,
+        project: this.proj.id,
         role: "roles/admin",
         member: `user:${v.gmail}`,
       });

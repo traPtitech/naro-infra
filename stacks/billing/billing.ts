@@ -10,20 +10,14 @@ import {
 } from "@cdktf/provider-google";
 import { AssetType, TerraformAsset, TerraformStack } from "cdktf";
 import { Construct } from "constructs";
-
-export interface BillingTopic {
-  project: project.Project;
-  topicId: string;
-}
-
 export class BillingManagerStack extends TerraformStack {
   constructor(
     scope: Construct,
     id: string,
-    billingProject: project.Project,
+    billingProjectId: string,
     billingAccountId: string,
     limit: number,
-    topics: BillingTopic[]
+    projects: project.Project[]
   ) {
     super(scope, id);
 
@@ -33,7 +27,7 @@ export class BillingManagerStack extends TerraformStack {
     });
 
     const bucket = new storageBucket.StorageBucket(scope, "bucket", {
-      project: billingProject.id,
+      project: billingProjectId,
       name: "billing-function",
       location: "ASIA-NORTHEAST1",
     });
@@ -52,7 +46,7 @@ export class BillingManagerStack extends TerraformStack {
       this,
       "service-account",
       {
-        project: billingProject.id,
+        project: billingProjectId,
         accountId: "billing-sa",
       }
     );
@@ -67,13 +61,21 @@ export class BillingManagerStack extends TerraformStack {
       }
     );
 
-    topics.forEach((v) => {
+    projects.forEach((v) => {
+      const topic = new pubsubTopic.PubsubTopic(
+        this,
+        "billing-pubsub-" + v.number,
+        {
+          project: billingProjectId,
+          name: "billing-pubsub-" + v.number,
+        }
+      );
       new cloudfunctions2Function.Cloudfunctions2Function(
         scope,
-        "bf-" + v.project.number,
+        "bf-" + v.number,
         {
-          project: billingProject.id,
-          name: v.project.number,
+          project: billingProjectId,
+          name: v.number,
           buildConfig: {
             runtime: "python311",
             source: {
@@ -84,25 +86,16 @@ export class BillingManagerStack extends TerraformStack {
             },
             entryPoint: "stop_billing",
             environmentVariables: {
-              GCP_PROJECT_ID: v.project.id,
+              GCP_PROJECT_ID: v.id,
             },
           },
           eventTrigger: {
             eventType: "google.cloud.pubsub.topic.v1.messagePublished",
-            pubsubTopic: v.topicId,
+            pubsubTopic: topic.id,
             serviceAccountEmail: billingSA.email,
           },
         }
       );
-      const topic = new pubsubTopic.PubsubTopic(
-        this,
-        "billing-pubsub-" + v.project.number,
-        {
-          project: billingProject.id,
-          name: "billing-pubsub-" + v.project.number,
-        }
-      );
-
       new billingBudget.BillingBudget(this, "budget", {
         billingAccount: billingAccountId,
         amount: {
@@ -112,7 +105,7 @@ export class BillingManagerStack extends TerraformStack {
           },
         },
         budgetFilter: {
-          projects: [v.project.id],
+          projects: [v.id],
         },
         allUpdatesRule: {
           pubsubTopic: topic.id,

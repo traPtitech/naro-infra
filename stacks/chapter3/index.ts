@@ -5,6 +5,9 @@ import { Folder } from "@cdktf/provider-google/lib/folder";
 import { ProjectStack, User } from "../project";
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
+import { project } from "@cdktf/provider-google";
+import { DataGoogleProject } from "@cdktf/provider-google/lib/data-google-project";
+import { BillingManagerStack } from "../billing/billing";
 
 export interface Chapter3Config {
   google: {
@@ -37,16 +40,29 @@ export class Chapter3Stack extends TerraformStack {
       displayName: "naro-chapter3",
       parent: "organizations/" + (config.organizationId || "0"),
     });
+    const billingProject = new DataGoogleProject(this, "this", {});
+
+    let projects: project.Project[] = [];
 
     configfile.participants.forEach((v) => {
-      new ProjectStack(this, "naro-chapter3-" + v.id, {
+      const proj = new ProjectStack(this, "naro-chapter3-" + v.id, {
         prefix: "naro-chapter3-",
         admins: configfile.admins,
         participant: v,
         folderId: folder.id,
         billingAccount: configfile.billingAccount,
       });
+      projects.push(proj.proj);
     });
+
+    new BillingManagerStack(
+      this,
+      "billing-manager",
+      billingProject.id,
+      configfile.billingAccount,
+      3000,
+      projects
+    );
 
     // define resources here
   }
