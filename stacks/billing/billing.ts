@@ -20,6 +20,7 @@ export class BillingManagerStack extends TerraformStack {
   constructor(
     scope: Construct,
     id: string,
+    billingProject: project.Project,
     billingAccountId: string,
     limit: number,
     topics: BillingTopic[]
@@ -32,6 +33,7 @@ export class BillingManagerStack extends TerraformStack {
     });
 
     const bucket = new storageBucket.StorageBucket(scope, "bucket", {
+      project: billingProject.id,
       name: "billing-function",
       location: "ASIA-NORTHEAST1",
     });
@@ -50,6 +52,7 @@ export class BillingManagerStack extends TerraformStack {
       this,
       "service-account",
       {
+        project: billingProject.id,
         accountId: "billing-sa",
       }
     );
@@ -69,6 +72,7 @@ export class BillingManagerStack extends TerraformStack {
         scope,
         "bf-" + v.project.number,
         {
+          project: billingProject.id,
           name: v.project.number,
           buildConfig: {
             runtime: "python311",
@@ -94,6 +98,7 @@ export class BillingManagerStack extends TerraformStack {
         this,
         "billing-pubsub-" + v.project.number,
         {
+          project: billingProject.id,
           name: "billing-pubsub-" + v.project.number,
         }
       );
@@ -114,6 +119,5 @@ export class BillingManagerStack extends TerraformStack {
         },
       });
     });
-    // Billing alert cloud pub/sub
   }
 }
