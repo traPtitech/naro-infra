@@ -8,9 +8,9 @@ import {
   storageBucket,
   storageBucketObject,
 } from "@cdktf/provider-google";
-import { AssetType, TerraformAsset, TerraformStack } from "cdktf";
+import { AssetType, TerraformAsset } from "cdktf";
 import { Construct } from "constructs";
-export class BillingManagerStack extends TerraformStack {
+export class BillingManager extends Construct {
   constructor(
     scope: Construct,
     id: string,
@@ -61,41 +61,33 @@ export class BillingManagerStack extends TerraformStack {
       }
     );
 
-    projects.forEach((v) => {
-      const topic = new pubsubTopic.PubsubTopic(
-        this,
-        "billing-pubsub-" + v.number,
-        {
-          project: billingProjectId,
-          name: "billing-pubsub-" + v.number,
-        }
-      );
-      new cloudfunctions2Function.Cloudfunctions2Function(
-        scope,
-        "bf-" + v.number,
-        {
-          project: billingProjectId,
-          name: v.number,
-          buildConfig: {
-            runtime: "python311",
-            source: {
-              storageSource: {
-                bucket: bucket.name,
-                object: source.name,
-              },
-            },
-            entryPoint: "stop_billing",
-            environmentVariables: {
-              GCP_PROJECT_ID: v.id,
+    projects.forEach((v, i) => {
+      const topic = new pubsubTopic.PubsubTopic(this, "billing-pubsub-" + i, {
+        project: billingProjectId,
+        name: "billing-pubsub-" + v.number,
+      });
+      new cloudfunctions2Function.Cloudfunctions2Function(scope, "bf-" + i, {
+        project: billingProjectId,
+        name: v.number,
+        buildConfig: {
+          runtime: "python311",
+          source: {
+            storageSource: {
+              bucket: bucket.name,
+              object: source.name,
             },
           },
-          eventTrigger: {
-            eventType: "google.cloud.pubsub.topic.v1.messagePublished",
-            pubsubTopic: topic.id,
-            serviceAccountEmail: billingSA.email,
+          entryPoint: "stop_billing",
+          environmentVariables: {
+            GCP_PROJECT_ID: v.id,
           },
-        }
-      );
+        },
+        eventTrigger: {
+          eventType: "google.cloud.pubsub.topic.v1.messagePublished",
+          pubsubTopic: topic.id,
+          serviceAccountEmail: billingSA.email,
+        },
+      });
       new billingBudget.BillingBudget(this, "budget", {
         billingAccount: billingAccountId,
         amount: {

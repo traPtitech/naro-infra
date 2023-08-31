@@ -1,13 +1,15 @@
 import { Construct } from "constructs";
 import { GcsBackend, TerraformStack } from "cdktf";
-import { GoogleProvider } from "@cdktf/provider-google/lib/provider";
-import { Folder } from "@cdktf/provider-google/lib/folder";
-import { ProjectStack, User } from "../project";
+import { ParticipantProject, User } from "../../constructs/project";
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
-import { project } from "@cdktf/provider-google";
-import { DataGoogleProject } from "@cdktf/provider-google/lib/data-google-project";
-import { BillingManagerStack } from "../billing/billing";
+import {
+  dataGoogleProject,
+  folder,
+  project,
+  provider,
+} from "@cdktf/provider-google";
+import { BillingManager } from "../../constructs/billing";
 
 export interface Chapter3Config {
   google: {
@@ -15,7 +17,7 @@ export interface Chapter3Config {
     region: string;
     bucket: string;
   };
-  organizationId?: string;
+  parentFolderId?: string;
 }
 
 interface Config {
@@ -31,31 +33,37 @@ export class Chapter3Stack extends TerraformStack {
       bucket: config.google.bucket,
     });
 
-    new GoogleProvider(this, "google", {
+    new provider.GoogleProvider(this, "google", {
       project: config.google.project,
       region: config.google.region,
     });
     const configfile = load(readFileSync("config.yaml", "utf8")) as Config;
-    const folder = new Folder(this, "chapter3", {
+    const fl = new folder.Folder(this, "chapter3", {
       displayName: "naro-chapter3",
-      parent: "organizations/" + (config.organizationId || "0"),
+      parent: config.parentFolderId
+        ? "folders/" + config.parentFolderId
+        : "organizations/0", // 組織なし
     });
-    const billingProject = new DataGoogleProject(this, "this", {});
+    const billingProject = new dataGoogleProject.DataGoogleProject(
+      this,
+      "this",
+      {}
+    );
 
     let projects: project.Project[] = [];
 
     configfile.participants.forEach((v) => {
-      const proj = new ProjectStack(this, "naro-chapter3-" + v.id, {
+      const proj = new ParticipantProject(this, "naro-chapter3-" + v.id, {
         prefix: "naro-chapter3-",
         admins: configfile.admins,
         participant: v,
-        folderId: folder.id,
+        folderId: fl.id,
         billingAccount: configfile.billingAccount,
       });
       projects.push(proj.proj);
     });
 
-    new BillingManagerStack(
+    new BillingManager(
       this,
       "billing-manager",
       billingProject.id,
