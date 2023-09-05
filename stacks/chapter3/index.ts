@@ -3,12 +3,7 @@ import { GcsBackend, TerraformStack } from "cdktf";
 import { ParticipantProject, User } from "../../constructs/project";
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
-import {
-  dataGoogleProject,
-  folder,
-  project,
-  provider,
-} from "@cdktf/provider-google";
+import { dataGoogleProject, project, provider } from "@cdktf/provider-google";
 import { BillingManager } from "../../constructs/billing";
 
 export interface Chapter3Config {
@@ -17,7 +12,6 @@ export interface Chapter3Config {
     region: string;
     bucket: string;
   };
-  parentFolderId?: string;
 }
 
 interface Config {
@@ -36,19 +30,16 @@ export class Chapter3Stack extends TerraformStack {
     new provider.GoogleProvider(this, "google", {
       project: config.google.project,
       region: config.google.region,
+      billingProject: config.google.project,
+      userProjectOverride: true,
     });
-    const configfile = load(readFileSync("config.yaml", "utf8")) as Config;
-    const fl = new folder.Folder(this, "chapter3", {
-      displayName: "naro-chapter3",
-      parent: config.parentFolderId
-        ? "folders/" + config.parentFolderId
-        : "organizations/0", // 組織なし
-    });
+
     const billingProject = new dataGoogleProject.DataGoogleProject(
       this,
       "this",
       {}
     );
+    const configfile = load(readFileSync("config.yaml", "utf8")) as Config;
 
     let projects: project.Project[] = [];
 
@@ -57,7 +48,6 @@ export class Chapter3Stack extends TerraformStack {
         prefix: "naro-chapter3-",
         admins: configfile.admins,
         participant: v,
-        folderId: fl.id,
         billingAccount: configfile.billingAccount,
       });
       projects.push(proj.proj);
@@ -66,12 +56,10 @@ export class Chapter3Stack extends TerraformStack {
     new BillingManager(
       this,
       "billing-manager",
-      billingProject.id,
+      billingProject,
       configfile.billingAccount,
       3000,
       projects
     );
-
-    // define resources here
   }
 }

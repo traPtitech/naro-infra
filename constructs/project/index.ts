@@ -9,7 +9,6 @@ export interface ProjectConfig {
   prefix: string;
   admins: User[];
   participant: User;
-  folderId: string;
   billingAccount: string;
 }
 
@@ -27,8 +26,10 @@ export class ParticipantProject extends Construct {
           config.participant.id +
           "-" +
           Math.floor(new Date().getTime() / 1000).toString(),
-        folderId: config.folderId,
         billingAccount: config.billingAccount,
+        lifecycle: {
+          ignoreChanges: ["project_id"],
+        },
       }
     );
 
