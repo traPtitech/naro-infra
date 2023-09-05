@@ -23,6 +23,8 @@ const requiredServices = [
   "run.googleapis.com",
   "cloudbuild.googleapis.com",
 ];
+// Create repository operation for projects/xxx/locations/asia-northeast1/repositories/gcf-artifacts has failed. で動かない
+// 予算超えたらプロジェクトとめる機構(のはずだった)
 export class BillingManager extends Construct {
   constructor(
     scope: Construct,
@@ -39,7 +41,7 @@ export class BillingManager extends Construct {
       const service = new projectService.ProjectService(this, "service-" + i, {
         project: billingProject.number,
         service: v,
-        disableOnDestroy: true,
+        disableOnDestroy: false,
       });
       cfDependencies.push(service);
     });
@@ -68,13 +70,14 @@ export class BillingManager extends Construct {
 
     const sa = new serviceAccount.ServiceAccount(this, "bf-sa", {
       accountId: "billing-sa",
-      project: billingProject.id,
+      project: billingProject.projectId,
     });
 
     const roles = [
       "roles/run.invoker",
       "roles/eventarc.eventReceiver",
-      "roles/artifactregistry.reader",
+      "roles/artifactregistry.admin",
+      "roles/storage.admin",
     ];
 
     roles.forEach((v, i) => {
@@ -113,14 +116,20 @@ export class BillingManager extends Construct {
             GCP_PROJECT_ID: v.id,
           },
         },
+        serviceConfig: {
+          serviceAccountEmail: sa.email,
+          allTrafficOnLatestRevision: true,
+        },
         eventTrigger: {
           eventType: "google.cloud.pubsub.topic.v1.messagePublished",
+          serviceAccountEmail: sa.email,
           pubsubTopic: topic.id,
         },
       });
       new billingBudget.BillingBudget(this, "budget", {
         dependsOn: cfDependencies,
         billingAccount: billingAccountId,
+        displayName: `${v.projectId}の予算`,
         amount: {
           specifiedAmount: {
             currencyCode: "JPY",

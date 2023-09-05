@@ -3,8 +3,7 @@ import { GcsBackend, TerraformStack } from "cdktf";
 import { ParticipantProject, User } from "../../constructs/project";
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
-import { dataGoogleProject, project, provider } from "@cdktf/provider-google";
-import { BillingManager } from "../../constructs/billing";
+import { project, provider } from "@cdktf/provider-google";
 
 export interface Chapter3Config {
   google: {
@@ -34,11 +33,11 @@ export class Chapter3Stack extends TerraformStack {
       userProjectOverride: true,
     });
 
-    const billingProject = new dataGoogleProject.DataGoogleProject(
-      this,
-      "this",
-      {}
-    );
+    // const billingProject = new dataGoogleProject.DataGoogleProject(
+    //   this,
+    //   "this",
+    //   {}
+    // );
     const configfile = load(readFileSync("config.yaml", "utf8")) as Config;
 
     let projects: project.Project[] = [];
@@ -53,13 +52,13 @@ export class Chapter3Stack extends TerraformStack {
       projects.push(proj.proj);
     });
 
-    new BillingManager(
-      this,
-      "billing-manager",
-      billingProject,
-      configfile.billingAccount,
-      3000,
-      projects
-    );
+    // new BillingManager(
+    //   this,
+    //   "billing-manager",
+    //   billingProject,
+    //   configfile.billingAccount,
+    //   3000,
+    //   projects
+    // );
   }
 }
