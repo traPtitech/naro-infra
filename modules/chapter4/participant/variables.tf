@@ -20,3 +20,7 @@ variable "machine_image_id" {
 variable "machine_size" {
   type = string
 }
+
+variable "subnet_id" {
+  type = string
+}

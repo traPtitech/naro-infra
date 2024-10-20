@@ -17,4 +17,5 @@ module "paricipants" {
   admins           = var.admins
   machine_image_id = var.user_mi_id
   machine_size     = "e2-micro"
+  subnet_id        = google_compute_subnetwork.this.id
 }
