@@ -1,0 +1,57 @@
+- name: Create rXXX
+  become: true
+  ansible.community.docker_container:
+    image: ghcr.io/hijiki51/internetarchlecture/vyos:1.4
+    name: "r{{ item }}"
+    hostname: "r{{ item }}"
+    network_mode: "none"
+    restart_policy: always
+    detach: true
+    privileged: true
+    volumes:
+      - "/lib/modules:/lib/modules"
+      - "r{{ item }}:/opt/vyatta"
+    command: "/sbin/init"
+  loop:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+- name: Create rEX
+  become: true
+  ansible.community.docker_container:
+    image: ghcr.io/hijiki51/internetarchlecture/vyos:1.4
+    name: "rEX"
+    hostname: "rEX"
+    network_mode: "host"
+    restart_policy: always
+    detach: true
+    privileged: true
+    volumes:
+      - "/lib/modules:/lib/modules"
+      - "rEX:/opt/vyatta"
+    command: "/sbin/init"
+- name: Create nameserver
+  become: true
+  ansible.community.docker_container:
+    image: ghcr.io/hijiki51/internetarchlecture/bind9:9.18-22.04_beta
+    name: "ns"
+    hostname: "ns"
+    network_mode: "host"
+    restart_policy: always
+    detach: true
+    privileged: true
+    volumes:
+      - "lib_bind:/var/lib/bind"
+      - "cache_bind:/var/cache/bind"
+      - "named:/etc/bind"
+    command: "/sbin/init"
+- name: Init network topology
+  ansible.builtin.shell: |
+    nic_full_reset
+    add_server r4 s1
+    add_server r4 s2
+    add_server r4 s3
+    add_server rEX sEX

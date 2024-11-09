@@ -1,0 +1,23 @@
+- name: Setup docker
+  ansible.builtin.include_tasks: docker.yaml
+- name: Setup openvswitch
+  ansible.builtin.include_tasks: openvswitch.yaml
+- name: Create user
+  ansible.builtin.user:
+    name: student
+    shell: /bin/bash
+    password: "{{ 'student' | password_hash('sha512') }}"
+    update_password: on_create
+- name: Setup command
+  ansible.builtin.copy:
+    src: files/.command
+    dest: /etc/.command
+    mode: "0644"
+- name: Setup bashrc
+  ansible.builtin.lineinfile:
+    path: /etc/bash.bashrc
+    line: "source /etc/.command"
+    create: yes
+    state: present
+- name: Source bashrc
+  ansible.builtin.shell: source /etc/bash.bashrc

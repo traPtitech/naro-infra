@@ -1,0 +1,7 @@
+- name: Install openvswitch
+  ansible.builtin.apt:
+    name:
+      - openvswitch-common
+      - openvswitch-switch
+    state: present
+    update_cache: true
