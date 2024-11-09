@@ -2,6 +2,7 @@
 # https://docs.vyos.io/en/sagitta/contributing/build-vyos.html#build-vyos
 # https://github.com/abejjj/vyos_tutorial/blob/main/build/build_docker_image.sh
 CURRENT_DIR=$(pwd)
+DOCKER_REPOSITORY=""
 mkdir -p build
 cd build
 
@@ -22,7 +23,7 @@ sudo mv ./build/*.iso ../
 # mount
 cd ..
 ISO_FILE=$(ls vyos-*-rolling-*.iso)
-VYOS_IMAGE_TAG="${ISO_FILE//-amd64*.iso}"
+VYOS_IMAGE_TAG="${DOCKER_REPOSITORY}${ISO_FILE//-amd64*.iso}"
 
 mkdir iso
 

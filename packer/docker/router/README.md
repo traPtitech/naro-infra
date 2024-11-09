@@ -1,5 +1,7 @@
-# vyos Image
+# router Image
 
-公式のDocker Imageは更新されてないので、自前ビルド
+中身はVyOSのDockerイメージ。Private registryにあげること。
 
-WSL2(Ubuntu 24.04)で動作確認済み
+ref: https://forum.vyos.io/t/lts-release-package-repositories-permanently-closed-for-public-access/14637
+
+build.shはWSL2(Ubuntu 24.04)で動作確認済み
