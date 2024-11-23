@@ -2,7 +2,7 @@
 # https://docs.vyos.io/en/sagitta/contributing/build-vyos.html#build-vyos
 # https://github.com/abejjj/vyos_tutorial/blob/main/build/build_docker_image.sh
 CURRENT_DIR=$(pwd)
-DOCKER_REPOSITORY=""
+DOCKER_REPOSITORY="asia-northeast1-docker.pkg.dev/naro-chapter4/images"
 mkdir -p build
 cd build
 

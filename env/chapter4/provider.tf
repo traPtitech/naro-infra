@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "naro-tfstate"
+    bucket = "naro-tfstate-20241123"
     prefix = "naro/chapter4"
   }
 }

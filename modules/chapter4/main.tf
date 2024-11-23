@@ -19,3 +19,12 @@ module "paricipants" {
   machine_size     = "e2-micro"
   subnet_id        = google_compute_subnetwork.this.id
 }
+
+
+resource "google_project_service" "dependencies" {
+  for_each = toset([
+    "compute.googleapis.com",
+  ])
+  service            = each.value
+  disable_on_destroy = false
+}
