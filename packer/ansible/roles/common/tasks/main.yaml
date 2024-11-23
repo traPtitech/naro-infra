@@ -4,13 +4,11 @@
   ansible.builtin.include_tasks: openvswitch.yaml
 - name: Create user
   ansible.builtin.user:
-    name: student
+    name: participant
     shell: /bin/bash
-    password: "{{ 'student' | password_hash('sha512') }}"
-    update_password: on_create
 - name: Setup command
-  ansible.builtin.copy:
-    src: files/.command
+  ansible.builtin.template:
+    src: .command.j2.sh
     dest: /etc/.command
     mode: "0644"
 - name: Setup bashrc

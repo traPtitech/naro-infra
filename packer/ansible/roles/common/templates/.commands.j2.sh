@@ -31,7 +31,7 @@ add_server() {
     container_name=$2
     ovs-vsctl add-br br-$router_name-server
     ovs-docker add-port br-$router_name-server eth100 $router_name
-    docker run -d --restart always --name $container_name --hostname=$container_name --net=none --privileged asia-northeast1-docker.pkg.dev/naro-chapter4/images/server:latest /bin/sh -c "while :; do sleep 1000; done"
+    docker run -d --restart always --name $container_name --hostname=$container_name --net=none --privileged {{images.server}} /bin/sh -c "while :; do sleep 1000; done"
     ovs-docker add-port br-$router_name-server ens4 $container_name 
 }
 
@@ -70,9 +70,9 @@ full_reset() {
     docker ps -qa | xargs docker rm -f
     docker network prune
 
-    seq 1 6 | xargs -IXXX docker run -d --restart always --name rXXX --hostname=rXXX --net=none --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta asia-northeast1-docker.pkg.dev/naro-chapter4/images/vyos-1.5-rolling-202411230922-generic:latest /sbin/init
-    docker run -d --restart always --name rEX --hostname=rEX --net=host --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta asia-northeast1-docker.pkg.dev/naro-chapter4/images/vyos-1.5-rolling-202411230922-generic:latest /sbin/init
-    docker run -d --restart always --name ns --hostname=ns --net=host --privileged -v named:/etc/bind -v lib_bind:/var/lib/bind -v cache_bind:/var/cache/bind asia-northeast1-docker.pkg.dev/naro-chapter4/images/ns:latest
+    seq 1 6 | xargs -IXXX docker run -d --restart always --name rXXX --hostname=rXXX --net=none --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta {{images.vyos}} /sbin/init
+    docker run -d --restart always --name rEX --hostname=rEX --net=host --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta {{images.vyos}} /sbin/init
+    docker run -d --restart always --name ns --hostname=ns --net=host --privileged -v named:/etc/bind -v lib_bind:/var/lib/bind -v cache_bind:/var/cache/bind {{images.ns}}
 
     nic_full_reset
     add_server r4 s1

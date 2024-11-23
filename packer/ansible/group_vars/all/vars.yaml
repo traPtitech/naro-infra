@@ -1,0 +1,5 @@
+
+images:
+  vyos: "asia-northeast1-docker.pkg.dev/naro-chapter4/images/ns:latest"
+  ns: "asia-northeast1-docker.pkg.dev/naro-chapter4/images/vyos-1.5-rolling-202411230922-generic:latest"
+  server: "asia-northeast1-docker.pkg.dev/naro-chapter4/images/server:latest"
