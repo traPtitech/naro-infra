@@ -1,7 +1,7 @@
 attach() {	
     name=$1	
     if [ "${name:0:1}" = "r" ]; then	
-        docker exec -it --user 117 $name /bin/vbash	
+        docker exec -it --user 1002 $name /bin/vbash	
     else	
         docker exec -it $name /bin/bash	
     fi	
@@ -44,12 +44,17 @@ add_server() {
 reset_server() {
     router_name=$1
     container_name=$2
-    ovs-vsctl del-br br-$router_name-server 2> /dev/null
-    ovs-docker del-ports dummy $router_name 2> /dev/null
-    ovs-docker del-ports $container_name 2> /dev/null
+    ovs-docker del-port br-$router_name-server eth100 $container_name 2> /dev/null
 }
 
 server_full_reset() {
+    reset_server r4 s1
+    reset_server r4 s2
+    reset_server r4 s3
+    reset_server rEX sEX
+    ovs-vsctl del-br br-r4-server 2> /dev/null
+    ovs-vsctl del-br br-rEX-server 2> /dev/null
+
     add_server r4 s1 
     add_server r4 s2 
     add_server r4 s3 
@@ -110,8 +115,5 @@ full_reset() {
     docker run -d --restart always --name ns --hostname=ns --net=host --privileged -v named:/etc/bind -v lib_bind:/var/lib/bind -v cache_bind:/var/cache/bind {{images.ns}}
 
     nic_full_reset
-    add_server r4 s1
-    add_server r4 s2
-    add_server r4 s3
-    add_server rEX sEX
+    server_full_reset
 }

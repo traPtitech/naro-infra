@@ -36,3 +36,9 @@
   ansible.builtin.shell:
     executable: /bin/bash
     cmd: gcloud auth configure-docker --quiet {{ registry }}
+- name: Set docker default group
+  become: true
+  ansible.builtin.copy:
+    src: add_to_docker.sh
+    dest: /etc/skel/add_to_docker.sh
+    mode: "0755"

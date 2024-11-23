@@ -47,7 +47,6 @@
       - "lib_bind:/var/lib/bind"
       - "cache_bind:/var/cache/bind"
       - "named:/etc/bind"
-    command: "/sbin/init"
 - name: Init network topology
   become: true
   # 微妙すぎるのでどうにかしたい

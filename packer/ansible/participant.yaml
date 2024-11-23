@@ -1,5 +1,4 @@
-
-- hosts: pariticipant
+- hosts: participant
   become: true
   roles:
     - common
