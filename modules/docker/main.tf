@@ -14,3 +14,9 @@ resource "google_project_service" "dependencies" {
   service            = each.value
   disable_on_destroy = false
 }
+
+resource "google_artifact_registry_repository_iam_member" "images" {
+  repository = google_artifact_registry_repository.images.name
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${var.project_id}-compute@developer.gserviceaccount.com"
+}

@@ -8,7 +8,7 @@ attach() {
 }
 
 add_nic() {
-    ovs-docker add-port $1 eth$3 $2
+    ovs-docker add-port $1 eth$3 $2 2> /dev/null
     if [ $? != 0 ]; then
         add_nic $1 $2 $(($3+1))
     fi
@@ -17,13 +17,18 @@ add_nic() {
 connect() {    
     cn1=$1
     cn2=$2    
-    ovs-vsctl add-br br-$1-$2 
+    ovs-vsctl add-br br-$1-$2 2> /dev/null
     add_nic br-$1-$2 $1 10      
     add_nic br-$1-$2 $2 10  
 }
 
+disconnect() {
+    ovs-vsctl del-br br-$1-$2 2> /dev/null
+    reset_nic $1
+}
+
 reset_nic() {    
-    ovs-docker del-ports dummy $1
+    ovs-docker del-ports dummy $1 2> /dev/null
 }
 
 add_server() {
@@ -31,8 +36,24 @@ add_server() {
     container_name=$2
     ovs-vsctl add-br br-$router_name-server
     ovs-docker add-port br-$router_name-server eth100 $router_name
-    docker run -d --restart always --name $container_name --hostname=$container_name --net=none --privileged {{images.server}} /bin/sh -c "while :; do sleep 1000; done"
+    docker start $container_name || docker run -d --restart always --name $container_name --hostname=$container_name --net=none --privileged {{images.server}} /bin/sh -c "while :; do sleep 1000; done"
     ovs-docker add-port br-$router_name-server ens4 $container_name 
+}
+
+
+reset_server() {
+    router_name=$1
+    container_name=$2
+    ovs-vsctl del-br br-$router_name-server 2> /dev/null
+    ovs-docker del-ports dummy $router_name 2> /dev/null
+    ovs-docker del-ports $container_name 2> /dev/null
+}
+
+server_full_reset() {
+    add_server r4 s1 
+    add_server r4 s2 
+    add_server r4 s3 
+    add_server rEX sEX
 }
 
 nic_full_reset() {
@@ -50,6 +71,20 @@ nic_full_reset() {
     reset_nic r6
     reset_nic rEX
     reset_nic ns    
+
+    disconnect r1 r6
+    disconnect r1 r2
+    disconnect r2 r3
+    disconnect r2 r5
+    disconnect r3 r4
+    disconnect r4 r5
+    disconnect r5 r6
+    disconnect r1 rEX
+    disconnect r6 rEX
+    disconnect r4 ns
+
+    reset_nic br-r4-server
+    reset_nic br-rEX-server
 
     connect r1 r6
     connect r1 r2

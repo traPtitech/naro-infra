@@ -1,0 +1,9 @@
+version: "3"
+
+tasks: 
+  init:
+    cmds:
+      - packer init participant.pkr.hcl
+  build:pariticipant:
+    cmds:
+      - packer build participant.pkr.hcl

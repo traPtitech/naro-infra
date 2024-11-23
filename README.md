@@ -1,8 +1,13 @@
 # naro-infra
-Webエンジニアになろう講習会第三部移行で使うインフラのプロビジョニングスクリプト
+Webエンジニアになろう講習会第三部以降で使うインフラのプロビジョニングスクリプト
 
 
-```
-npm install -g @go-task/cli
-task init
-```
+## Requirements
+unsquashfs が動く環境
+
+Google Cloud のアカウント
+
+- packer
+- ansible
+- terraform
+- docker

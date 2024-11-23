@@ -1,6 +1,6 @@
 - name: Create rXXX
   become: true
-  ansible.community.docker_container:
+  community.docker.docker_container:
     image: "{{ images.vyos }}"
     name: "r{{ item }}"
     hostname: "r{{ item }}"
@@ -21,7 +21,7 @@
     - 6
 - name: Create rEX
   become: true
-  ansible.community.docker_container:
+  community.docker.docker_container:
     image: "{{ images.vyos }}"
     name: "rEX"
     hostname: "rEX"
@@ -35,7 +35,7 @@
     command: "/sbin/init"
 - name: Create nameserver
   become: true
-  ansible.community.docker_container:
+  community.docker.docker_container:
     image: "{{ images.ns }}"
     name: "ns"
     hostname: "ns"
@@ -49,9 +49,6 @@
       - "named:/etc/bind"
     command: "/sbin/init"
 - name: Init network topology
-  ansible.builtin.shell: |
-    nic_full_reset
-    add_server r4 s1
-    add_server r4 s2
-    add_server r4 s3
-    add_server rEX sEX
+  become: true
+  # 微妙すぎるのでどうにかしたい
+  ansible.builtin.shell: /bin/bash -ilc "source /etc/bash.bashrc && nic_full_reset && server_full_reset"

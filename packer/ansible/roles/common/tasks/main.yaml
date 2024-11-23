@@ -7,8 +7,9 @@
     name: participant
     shell: /bin/bash
 - name: Setup command
+  become: true
   ansible.builtin.template:
-    src: .command.j2.sh
+    src: .commands.j2.sh
     dest: /etc/.command
     mode: "0644"
 - name: Setup bashrc
@@ -17,5 +18,3 @@
     line: "source /etc/.command"
     create: yes
     state: present
-- name: Source bashrc
-  ansible.builtin.shell: source /etc/bash.bashrc

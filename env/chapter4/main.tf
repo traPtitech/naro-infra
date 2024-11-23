@@ -1,6 +1,10 @@
+data "google_project" "this" {}
 module "docker" {
-  source = "../../modules/docker"
+  source     = "../../modules/docker"
+  project_id = data.google_project.this.number
 }
+
+
 
 # module "chapter4" {
 #   source = "../../modules/participants"
