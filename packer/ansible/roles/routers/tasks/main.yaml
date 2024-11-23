@@ -1,7 +1,7 @@
 - name: Create rXXX
   become: true
   ansible.community.docker_container:
-    image: ghcr.io/hijiki51/internetarchlecture/vyos:1.4
+    image: asia-northeast1-docker.pkg.dev/naro-chapter4/images/vyos-1.5-rolling-202411230922-generic:latest
     name: "r{{ item }}"
     hostname: "r{{ item }}"
     network_mode: "none"
@@ -22,7 +22,7 @@
 - name: Create rEX
   become: true
   ansible.community.docker_container:
-    image: ghcr.io/hijiki51/internetarchlecture/vyos:1.4
+    image: asia-northeast1-docker.pkg.dev/naro-chapter4/images/vyos-1.5-rolling-202411230922-generic:latest
     name: "rEX"
     hostname: "rEX"
     network_mode: "host"
@@ -36,7 +36,7 @@
 - name: Create nameserver
   become: true
   ansible.community.docker_container:
-    image: ghcr.io/hijiki51/internetarchlecture/bind9:9.18-22.04_beta
+    image: asia-northeast1-docker.pkg.dev/naro-chapter4/images/ns:latest
     name: "ns"
     hostname: "ns"
     network_mode: "host"
