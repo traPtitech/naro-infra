@@ -9,7 +9,7 @@ resource "google_compute_subnetwork" "this" {
   network       = google_compute_network.this.id
 }
 
-module "paricipants" {
+module "participants" {
   count  = length(var.users)
   source = "./participants"
 
