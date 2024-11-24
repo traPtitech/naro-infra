@@ -8,3 +8,6 @@ participants:
   osaka:
     - id: 
       public_key:
+  seoul:
+    - id: 
+      public_key:

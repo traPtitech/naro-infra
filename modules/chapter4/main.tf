@@ -17,6 +17,13 @@ resource "google_compute_subnetwork" "osaka" {
   network       = google_compute_network.this.id
 }
 
+resource "google_compute_subnetwork" "seoul" {
+  name          = "naro-ch4-subnet-seoul"
+  region        = "asia-northeast3"
+  ip_cidr_range = "10.2.0.0/16"
+  network       = google_compute_network.this.id
+}
+
 resource "google_compute_firewall" "ssh" {
   name    = "allow-ssh"
   network = google_compute_network.this.name
@@ -55,6 +62,18 @@ module "osaka" {
   image_id     = var.user_image_id
   machine_type = "e2-medium"
   subnet_id    = google_compute_subnetwork.osaka.id
+}
+
+module "seoul" {
+  count  = length(var.users.seoul)
+  source = "./participant"
+  zone   = "asia-northeast3-a"
+
+  user         = var.users.seoul[count.index]
+  admins       = var.admins
+  image_id     = var.user_image_id
+  machine_type = "e2-medium"
+  subnet_id    = google_compute_subnetwork.seoul.id
 }
 
 

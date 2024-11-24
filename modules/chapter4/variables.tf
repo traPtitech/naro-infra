@@ -8,6 +8,10 @@ variable "users" {
       id         = string
       public_key = string
     }))
+    seoul = list(object({
+      id         = string
+      public_key = string
+    }))
   })
 }
 
