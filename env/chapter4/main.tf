@@ -1,4 +1,10 @@
 data "google_project" "this" {}
+
+locals {
+  config        = yamldecode(file("config.yaml"))
+  user_image_id = "naro-chapter4-participant-20241124-0423" # TODO: familyにしたい
+}
+
 module "docker" {
   source     = "../../modules/docker"
   project_id = data.google_project.this.number
@@ -6,10 +12,11 @@ module "docker" {
 
 
 
-# module "chapter4" {
-#   source = "../../modules/participants"
+module "chapter4" {
+  source = "../../modules/chapter4"
 
-#   users      = var.users
-#   admins     = var.admins
-#   user_mi_id = var.user_mi_id
-# }
+  users          = coalesce(local.config.participants, [])
+  admins         = local.config.admins
+  user_image_id  = local.user_image_id
+  admin_image_id = local.user_image_id # TODO: Admin用Imageの準備
+}

@@ -48,6 +48,7 @@ reset_server() {
 }
 
 server_full_reset() {
+    echo "Server full reset"
     reset_server r4 s1
     reset_server r4 s2
     reset_server r4 s3
@@ -62,6 +63,7 @@ server_full_reset() {
 }
 
 nic_full_reset() {
+    echo "NIC full reset"
     docker start $(docker ps -qa)
     
     seq 1 6 | xargs -I XXX docker exec rXXX bash -c "echo '127.0.0.1 rXXX' >> /etc/hosts"
@@ -110,9 +112,9 @@ full_reset() {
     docker ps -qa | xargs docker rm -f
     docker network prune
 
-    seq 1 6 | xargs -IXXX docker run -d --restart always --name rXXX --hostname=rXXX --net=none --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta {{images.vyos}} /sbin/init
-    docker run -d --restart always --name rEX --hostname=rEX --net=host --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta {{images.vyos}} /sbin/init
-    docker run -d --restart always --name ns --hostname=ns --net=host --privileged -v named:/etc/bind -v lib_bind:/var/lib/bind -v cache_bind:/var/cache/bind {{images.ns}}
+    seq 1 6 | xargs -IXXX docker run -d --cpus=".8" --restart always --name rXXX --hostname=rXXX --net=none --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta {{images.vyos}} /sbin/init
+    docker run -d --cpus=".8" --restart always --name rEX --hostname=rEX --net=host --privileged -v /lib/modules:/lib/modules -v rXXX:/opt/vyatta {{images.vyos}} /sbin/init
+    docker run -d --cpus=".8" --restart always --name ns --hostname=ns --net=host --privileged -v named:/etc/bind -v lib_bind:/var/lib/bind -v cache_bind:/var/cache/bind {{images.ns}}
 
     nic_full_reset
     server_full_reset

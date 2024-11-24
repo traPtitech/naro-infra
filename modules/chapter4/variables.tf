@@ -14,10 +14,10 @@ variable "admins" {
 
 
 
-variable "user_mi_id" {
+variable "user_image_id" {
   type = string
 }
 
-variable "admin_mi_id" {
+variable "admin_image_id" {
   type = string
 }

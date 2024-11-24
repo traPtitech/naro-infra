@@ -8,4 +8,5 @@ terraform {
 provider "google" {
   project = "naro-chapter4"
   region  = "asia-northeast1"
+  zone    = "asia-northeast1-a"
 }

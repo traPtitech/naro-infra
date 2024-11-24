@@ -12,12 +12,12 @@ variable "admins" {
   }))
 }
 
-variable "machine_image_id" {
+variable "image_id" {
   type = string
 
 }
 
-variable "machine_size" {
+variable "machine_type" {
   type = string
 }
 
