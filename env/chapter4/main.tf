@@ -15,8 +15,12 @@ module "docker" {
 module "chapter4" {
   source = "../../modules/chapter4"
 
-  users          = coalesce(local.config.participants, [])
+  users = coalesce(local.config.participants, {
+    tokyo = [],
+    osaka = [],
+  })
   admins         = local.config.admins
   user_image_id  = local.user_image_id
   admin_image_id = local.user_image_id # TODO: Admin用Imageの準備
 }
+

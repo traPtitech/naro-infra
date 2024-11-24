@@ -24,3 +24,7 @@ variable "machine_type" {
 variable "subnet_id" {
   type = string
 }
+
+variable "zone" {
+  type = string
+}

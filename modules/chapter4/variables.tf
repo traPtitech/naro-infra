@@ -1,8 +1,14 @@
 variable "users" {
-  type = list(object({
-    id         = string
-    public_key = string
-  }))
+  type = object({
+    tokyo = list(object({
+      id         = string
+      public_key = string
+    }))
+    osaka = list(object({
+      id         = string
+      public_key = string
+    }))
+  })
 }
 
 variable "admins" {

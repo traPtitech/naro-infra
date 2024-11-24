@@ -2,5 +2,9 @@ admins:
   - id: 
     public_key: 
 participants:
-  - id: 
-    public_key: 
+  tokyo:
+    - id: 
+      public_key: 
+  osaka:
+    - id: 
+      public_key:

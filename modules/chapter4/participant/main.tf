@@ -1,5 +1,6 @@
 resource "google_compute_instance" "this" {
   name = format("naro-ch4-%s", var.user.id)
+  zone = var.zone
 
   boot_disk {
     auto_delete = false
@@ -24,6 +25,7 @@ resource "google_compute_disk" "this" {
   name  = format("naro-ch4-%s-disk", var.user.id)
   image = var.image_id
   size  = 30
+  zone  = var.zone
 
   type = "pd-standard"
 }
