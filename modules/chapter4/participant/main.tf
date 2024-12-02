@@ -13,7 +13,7 @@ resource "google_compute_instance" "this" {
     ssh-keys = join("\n", concat(tolist([format("%s:%s", var.user.id, var.user.public_key)]), tolist([for admin in var.admins : format("%s:%s", admin.id, admin.public_key)])))
   }
 
-  metadata_startup_script = "sudo sudo usermod -aG docker ${var.user.id}"
+  metadata_startup_script = "sudo usermod -aG docker ${var.user.id}"
 
   network_interface {
     subnetwork = var.subnet_id
